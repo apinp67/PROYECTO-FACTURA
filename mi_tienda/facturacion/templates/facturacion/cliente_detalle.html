@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block titulo %}{{ cliente }}{% endblock %}
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="tarjeta mb-3">
+            <h1 class="h3 titulo-pagina mb-3">{{ cliente }}</h1>
+            <ul class="list-group mb-3">
+                <li class="list-group-item"><b>Cédula:</b> {{ cliente.cedula }}</li>
+                <li class="list-group-item"><b>Correo:</b> {{ cliente.email|default:"-" }}</li>
+                <li class="list-group-item"><b>Teléfono:</b> {{ cliente.telefono|default:"-" }}</li>
+                <li class="list-group-item"><b>Dirección:</b> {{ cliente.direccion|default:"-" }}</li>
+            </ul>
+            <a href="{% url 'facturacion:cliente_editar' cliente.pk %}" class="btn btn-primary">Editar</a>
+            <a href="{% url 'facturacion:cliente_lista' %}" class="btn btn-outline-secondary">Volver</a>
+        </div>
+        <div class="tarjeta">
+            <h2 class="h5 mb-3">Ventas del cliente</h2>
+            <ul class="list-group">
+                {% for venta in cliente.ventas.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="{% url 'facturacion:venta_detalle' venta.pk %}">{{ venta }} ({{ venta.fecha_hora|date:"d/m/Y H:i" }})</a>
+                        <span class="fw-bold">${{ venta.total }}</span>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item text-muted">Este cliente aún no tiene ventas.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

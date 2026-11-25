@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block titulo %}{{ proveedor }}{% endblock %}
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="tarjeta">
+            <div class="row g-4">
+                <div class="col-md-5">
+                    {% if proveedor.logo %}
+                        <img src="{{ proveedor.logo.url }}" alt="{{ proveedor }}" class="foto-grande">
+                    {% else %}
+                        <div class="foto-grande d-grid text-muted" style="place-items:center">Sin logo</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-7">
+                    <h1 class="h3 titulo-pagina">{{ proveedor }}</h1>
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item"><b>RUC:</b> {{ proveedor.ruc }}</li>
+                        <li class="list-group-item"><b>Correo:</b> {{ proveedor.email|default:"-" }}</li>
+                        <li class="list-group-item"><b>Contacto:</b> {{ proveedor.contacto|default:"-" }}</li>
+                        <li class="list-group-item small text-muted">
+                            Registrado por {{ proveedor.user|default:"-" }} · creado {{ proveedor.fecha_creacion|date:"d/m/Y H:i" }}
+                        </li>
+                    </ul>
+                    <a href="{% url 'facturacion:proveedor_editar' proveedor.pk %}" class="btn btn-primary">Editar</a>
+                    <a href="{% url 'facturacion:proveedor_lista' %}" class="btn btn-outline-secondary">Volver</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

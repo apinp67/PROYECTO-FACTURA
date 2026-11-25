@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block titulo %}{{ titulo }}{% endblock %}
+{% block contenido %}
+<h1 class="h3 titulo-pagina mb-3">{{ titulo }}{% if object %} #{{ object.pk }}{% endif %}</h1>
+<form method="post" novalidate>
+    {% csrf_token %}
+    <div class="tarjeta mb-3">
+        <div class="row g-3">
+            {% for campo in form %}
+            <div class="col-md-4">
+                <label class="form-label fw-semibold" for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+                {{ campo }}
+                {% for error in campo.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="tarjeta mb-3">
+        <h2 class="h5">Productos comprados</h2>
+        {{ detalles.management_form }}
+        {% if detalles.non_form_errors %}
+            <div class="alert alert-danger">{{ detalles.non_form_errors }}</div>
+        {% endif %}
+        <table class="table align-middle">
+            <thead>
+                <tr><th>Producto</th><th style="width:140px">Cantidad</th><th style="width:160px">Costo unitario</th><th style="width:90px" class="text-center">Quitar</th></tr>
+            </thead>
+            <tbody id="filas">
+                {% for fila in detalles %}
+                <tr>
+                    <td>
+                        {% for oculto in fila.hidden_fields %}{{ oculto }}{% endfor %}
+                        {{ fila.producto }}
+                        {% for error in fila.producto.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </td>
+                    <td>
+                        {{ fila.cantidad }}
+                        {% for error in fila.cantidad.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </td>
+                    <td>
+                        {{ fila.precio }}
+                        {% for error in fila.precio.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </td>
+                    <td class="text-center">{{ fila.DELETE }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <template id="fila-vacia">
+            <tr>
+                <td>{% for oculto in detalles.empty_form.hidden_fields %}{{ oculto }}{% endfor %}{{ detalles.empty_form.producto }}</td>
+                <td>{{ detalles.empty_form.cantidad }}</td>
+                <td>{{ detalles.empty_form.precio }}</td>
+                <td class="text-center">{{ detalles.empty_form.DELETE }}</td>
+            </tr>
+        </template>
+        <button type="button" id="agregar-fila" class="btn btn-sm btn-outline-secondary">+ Agregar producto</button>
+        <p class="text-muted small mt-2 mb-0">Al guardar, las unidades ingresarán al stock y se calcularán el IVA y el total.</p>
+    </div>
+    <button type="submit" class="btn btn-verde">{{ boton }}</button>
+    <a href="{% url 'facturacion:compra_lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+</form>
+{% endblock %}
+{% block scripts %}
+<script>
+const totalFilas = document.getElementById("id_{{ detalles.prefix }}-TOTAL_FORMS");
+document.getElementById("agregar-fila").addEventListener("click", function () {
+    const numero = totalFilas.value;
+    const molde = document.getElementById("fila-vacia").innerHTML;
+    const nuevaFila = molde.replace(/__prefix__/g, numero);
+    document.getElementById("filas").insertAdjacentHTML("beforeend", nuevaFila);
+    totalFilas.value = parseInt(numero) + 1;
+});
+</script>
+{% endblock %}
